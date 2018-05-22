@@ -33,9 +33,13 @@ class PlayPublishApkTask extends PlayPublishTask {
 
         if (extension.track == 'rollout') {
             release.setUserFraction(extension.userFraction)
+            release.setStatus('inProgress')
+        } else {
+            release.setStatus('completed')
         }
 
         if (inputFolder.exists()) {
+            def releaseNotes = new ArrayList<LocalizedText>()
 
             // Matches if locale have the correct naming e.g. en-US for play store
             inputFolder.eachDirMatch(matcher) { dir ->
@@ -50,11 +54,13 @@ class PlayPublishApkTask extends PlayPublishTask {
                     def whatsNewText = TaskHelper.readAndTrimFile(project, whatsNewFile, MAX_CHARACTER_LENGTH_FOR_WHATS_NEW_TEXT, extension.errorOnSizeLimit)
                     def locale = dir.name
 
-                    release.getReleaseNotes().add(
+                    releaseNotes.add(
                             new LocalizedText().setText(whatsNewText).setLanguage(locale)
                     )
                 }
             }
+
+            release.setReleaseNotes(releaseNotes)
         }
 
         track.setReleases([release])
