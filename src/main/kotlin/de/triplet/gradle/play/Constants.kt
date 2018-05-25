@@ -38,16 +38,19 @@ internal val HTTP_TRANSPORT by lazy { GoogleNetHttpTransport.newTrustedTransport
 internal val TRACKS = arrayOf("alpha", "beta", "rollout", "production")
 internal val IMAGE_EXTENSIONS = arrayOf("png", "jpg")
 
-internal enum class ImageTypes(val fileName: String, val max: Int = MAX_SCREENSHOTS_SIZE) {
-    Icon("icon", 1),
-    FeatureGraphic("featureGraphic", 1),
-    PhoneScreenshots("phoneScreenshots"),
-    SevenInchScreenshots("sevenInchScreenshots"),
-    TenInchScreenshots("tenInchScreenshots"),
-    PromoGraphic("promoGraphic", 1),
-    TVBanner("tvBanner", 1),
-    TVScreenshots("tvScreenshots"),
-    WearScreenshots("wearScreenshots");
+//Min length for any side: 320px. Max length for any side: 3840px.
+internal data class ImageSize(val minWidth: Int, val minHeight: Int, val maxWidth: Int = minWidth, val maxHeight: Int = minHeight)
+internal val screenshotSize = ImageSize(320, 320, 3840, 3840)
+internal enum class ImageTypes(val fileName: String, val constraints: ImageSize, val max: Int = MAX_SCREENSHOTS_SIZE) {
+    Icon("icon",  ImageSize(512, 512), 1),
+    FeatureGraphic("featureGraphic", ImageSize(1024, 500), 1),
+    PhoneScreenshots("phoneScreenshots", screenshotSize),
+    SevenInchScreenshots("sevenInchScreenshots", screenshotSize),
+    TenInchScreenshots("tenInchScreenshots", screenshotSize),
+    PromoGraphic("promoGraphic", ImageSize(180, 120),  1),
+    TVBanner("tvBanner", ImageSize(1280, 720), 1),
+    TVScreenshots("tvScreenshots", screenshotSize),
+    WearScreenshots("wearScreenshots", screenshotSize);
 
     fun getImages(listingDir: File): List<AbstractInputStreamContent>? {
         val graphicDir = File(listingDir, fileName)
